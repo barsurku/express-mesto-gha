@@ -9,6 +9,27 @@ module.exports.getUsers = (req, res) => {
     }));
 };
 
+// module.exports.getUserByID = (req, res) => {
+//   User.findById(req.params.id)
+//     .then((user) => {
+//       if (!user) {
+//         res.status(ERROR_CODE.notFound).send({ message: 'Пользователь с таким ID не найден' });
+//         return;
+//       }
+//       res.send(user);
+//     })
+//     .catch((err) => {
+//       if (err.name === 'NotFound') {
+//         res.status(ERROR_CODE.badRequest).send({
+//           message: 'Ошибка получения данных',
+//         });
+//         return;
+//       }
+//       res.status(ERROR_CODE.internalServerError).send({
+//         message: 'Ошибка загрузки сервера',
+//       });
+//     });
+// };
 module.exports.getUserByID = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
@@ -18,17 +39,9 @@ module.exports.getUserByID = (req, res) => {
       }
       res.send(user);
     })
-    .catch((err) => {
-      if (err.name === 'NotFound') {
-        res.status(ERROR_CODE.badRequest).send({
-          message: 'Ошибка получения данных',
-        });
-        return;
-      }
-      res.status(ERROR_CODE.internalServerError).send({
-        message: 'Ошибка загрузки сервера',
-      });
-    });
+    .catch(() => res.status(ERROR_CODE.badRequest).send({
+      message: 'Ошибка получения данных',
+    }));
 };
 
 module.exports.createUser = (req, res) => {
