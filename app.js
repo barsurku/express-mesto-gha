@@ -9,8 +9,8 @@ app.use(express.json());
 
 const { PORT = 3000 } = process.env;
 
-app.use('/', usersRouter);
-app.use('/', cardsRouter);
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
 app.use('*', (req, res) => {
   res.status(notFound).send({
     message: 'Страница не найдена',
