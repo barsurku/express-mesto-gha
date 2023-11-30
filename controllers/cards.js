@@ -34,7 +34,7 @@ module.exports.likeCard = (req, res) => {
   )
     .then((cards) => res.status(200).send({ data: cards }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(ERROR_CODE.badRequest).send({
           message: 'Введены некорректные данные',
         });
@@ -68,7 +68,13 @@ module.exports.dislikeCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
-    .then((cards) => res.status(200).send({ data: cards }))
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_CODE.notFound).send({ message: 'Карточка не найдена' });
+        return;
+      }
+      res.send(card);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE.badRequest).send({

@@ -11,11 +11,17 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserByID = (req, res) => {
   User.findById(req.params.id)
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_CODE.notFound).send({ message: 'Пользователь с таким ID не найден' });
+        return;
+      }
+      res.send(user);
+    })
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(ERROR_CODE.notFound).send({
-          message: 'Пользователь с таким ID не найден',
+        res.status(ERROR_CODE.badRequest).send({
+          message: 'Ошибка получения данных',
         });
         return;
       }
@@ -55,7 +61,7 @@ module.exports.updateUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(ERROR_CODE.notFound).send({
+        res.status(ERROR_CODE.badRequest).send({
           message: 'Пользователь с таким ID не найден',
         });
         return;
@@ -79,7 +85,7 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(ERROR_CODE.notFound).send({
+        res.status(ERROR_CODE.badRequest).send({
           message: 'Пользователь с таким ID не найден',
         });
         return;
