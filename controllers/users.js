@@ -3,7 +3,7 @@ const ERROR_CODE = require('../utils/errors');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send({ users }))
     .catch(() => res.status(ERROR_CODE.internalServerError).send({
       message: 'Ошибка загрузки сервера',
     }));
@@ -11,24 +11,26 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserByID = (req, res) => {
   User.findById(req.params.id)
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'NotFound') {
-        res.status(ERROR_CODE.notFound).send({
-          message: 'Пользователь с таким ID не найден',
-        });
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_CODE.notFound).send({ message: 'Пользователь с данным ID не найден' });
         return;
       }
-      res.status(ERROR_CODE.internalServerError).send({
-        message: 'Ошибка загрузки сервера',
-      });
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_CODE.badRequest).send({ message: 'Введены некорректные данные' });
+        return;
+      }
+      res.status(ERROR_CODE.internalServerError).send({ message: 'Ошибка загрузки сервера' });
     });
 };
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE.badRequest).send({
@@ -52,7 +54,7 @@ module.exports.updateUser = (req, res) => {
       runValidators: true,
     },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({ user }))
     .catch((err) => {
       if (err.name === 'NotFound') {
         res.status(ERROR_CODE.badRequest).send({
