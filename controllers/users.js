@@ -56,15 +56,11 @@ module.exports.updateUser = (req, res) => {
   )
     .then((user) => res.send({ user }))
     .catch((err) => {
-      if (err.name === 'NotFound') {
-        res.status(ERROR_CODE.badRequest).send({
-          message: 'Пользователь с таким ID не найден',
-        });
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_CODE.badRequest).send({ message: 'Введены некорректные данные' });
         return;
       }
-      res.status(ERROR_CODE.internalServerError).send({
-        message: 'Ошибка загрузки сервера',
-      });
+      res.status(ERROR_CODE.internalServerError).send({ message: 'Ошибка загрузки сервера' });
     });
 };
 
