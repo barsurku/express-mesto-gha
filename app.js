@@ -17,7 +17,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use('/', usersRouter);
-app.use('/cards', cardsRouter);
+app.use('/', cardsRouter);
 app.use('*', (req, res) => {
   res.status(notFound).send({
     message: 'Страница не найдена',
