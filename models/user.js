@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const { ObjectId } = mongoose.Types;
-
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -10,13 +8,13 @@ const userSchema = new mongoose.Schema({
     maxlength: 30,
   },
   about: {
-    type: ObjectId,
+    type: String,
     required: true,
     minlength: 2,
     maxlength: 30,
   },
   avatar: {
-    type: ObjectId,
+    type: String,
     required: true,
   },
 });
