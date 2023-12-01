@@ -3,7 +3,7 @@ const ERROR_CODE = require('../utils/errors');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status().send({ data: cards }))
+    .then((cards) => res.send(cards))
     .catch(() => res.status(ERROR_CODE.internalServerError).send({
       message: 'Ошибка загрузки сервера',
     }));
