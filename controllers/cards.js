@@ -3,7 +3,7 @@ const ERROR_CODE = require('../utils/errors');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(200).send({ data: cards }))
+    .then((cards) => res.status().send({ data: cards }))
     .catch(() => res.status(ERROR_CODE.internalServerError).send({
       message: 'Ошибка загрузки сервера',
     }));
@@ -12,7 +12,7 @@ module.exports.getCards = (req, res) => {
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-    .then((cards) => res.status(200).send({ data: cards }))
+    .then((cards) => res.status(201).send({ data: cards }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE.badRequest).send({

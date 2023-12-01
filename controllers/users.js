@@ -30,7 +30,7 @@ module.exports.getUserByID = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(200).send({ user }))
+    .then((user) => res.status(201).send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE.badRequest).send({
@@ -76,7 +76,7 @@ module.exports.updateAvatar = (req, res) => {
   )
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'NotFound') {
+      if (err.name === 'ValidationError') {
         res.status(ERROR_CODE.notFound).send({
           message: 'Пользователь с таким ID не найден',
         });
