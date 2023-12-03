@@ -13,6 +13,10 @@ app.use(express.json());
 
 const { PORT = 3000 } = process.env;
 
+app.post('/signin', validateLoginAuth, login);
+app.post('/signup', validationCreateUser, createUser);
+app.use(auth);
+
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
 app.use('*', (req, res) => {
@@ -20,10 +24,6 @@ app.use('*', (req, res) => {
     message: 'Страница не найдена',
   });
 });
-app.post('/signin', validateLoginAuth, login);
-app.post('/signup', validationCreateUser, createUser);
-
-app.use(auth);
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
