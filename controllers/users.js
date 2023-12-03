@@ -14,6 +14,19 @@ module.exports.getUsers = (req, res, next) => {
     .catch((err) => next(err));
 };
 
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch(() => {
+      next(new UnauthorizedError('Неправильно введен email или пароль'));
+    });
+};
+
 module.exports.getUserByID = (req, res, next) => {
   User.findById(req.params.id)
     .then((user) => {
@@ -114,20 +127,5 @@ module.exports.updateAvatar = (req, res, next) => {
         return next(new BadRequest('Введены некорректные данные'));
       }
       return next(err);
-    });
-};
-
-module.exports.login = (req, res) => {
-  const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-      res.send({ token });
-    })
-    .catch((err) => {
-      res
-        .status(UnauthorizedError)
-        .send({ message: err.message });
     });
 };
