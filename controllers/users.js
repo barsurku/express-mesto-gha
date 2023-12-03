@@ -29,16 +29,13 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.getUserByID = (req, res, next) => {
-  User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        throw new NotFound('Пользователь с данным ID не найден');
-      }
-      return res.status(200).send({ data: user.toObject() });
-    })
+  User.findById(req.params.id)
+    .findById(req.params.userId)
+    .orFail(() => new NotFound('Пользователь не найден.'))
+    .then((users) => res.status().send(users))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequest('Введены некорректные данные'));
+        return next(new BadRequest('Переданы некорректные данные при поиске.'));
       }
       return next(err);
     });
