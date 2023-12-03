@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const UnauthorizedError = require('../utils/error/Unauthorized');
 const NotFound = require('../utils/error/notFound');
 const BadRequest = require('../utils/error/badRequest');
 const Conflict = require('../utils/error/Conflict');
@@ -23,9 +22,7 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.send({ token });
     })
-    .catch(() => {
-      next(new UnauthorizedError('Неправильно введен email или пароль'));
-    });
+    .catch((err) => next(err));
 };
 
 module.exports.getUserByID = (req, res, next) => {
@@ -36,13 +33,7 @@ module.exports.getUserByID = (req, res, next) => {
       }
       return res.status(200).send({ data: users.toObject() });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequest('Введены некорректные данные'));
-      } else {
-        next(err);
-      }
-    });
+    .catch((err) => next(err));
 };
 
 module.exports.getUser = (req, res, next) => {
