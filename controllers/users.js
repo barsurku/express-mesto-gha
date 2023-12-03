@@ -29,12 +29,12 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.getUserByID = (req, res, next) => {
-  User.findById(req.params.userId)
+  User.findById(req.params.id)
     .then((users) => {
       if (!users) {
         throw new NotFound('Пользователь с данным ID не найден');
       }
-      return res.status(200).send({ data: users.toObject() });
+      return res.status().send({ data: users.toObject() });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -92,11 +92,11 @@ module.exports.updateUser = (req, res, next) => {
       runValidators: true,
     },
   )
-    .then((user) => {
-      if (!user) {
+    .then((users) => {
+      if (!users) {
         throw new NotFound('Пользователь с данным ID не найден');
       }
-      return res.status().send({ user });
+      return res.status().send({ users });
     })
 
     .catch((err) => {
@@ -117,11 +117,11 @@ module.exports.updateAvatar = (req, res, next) => {
       runValidators: true,
     },
   )
-    .then((user) => {
-      if (!user) {
+    .then((users) => {
+      if (!users) {
         throw new NotFound('Пользователь с данным ID не найден');
       }
-      return res.status().send({ user });
+      return res.status().send({ users });
     })
 
     .catch((err) => {
