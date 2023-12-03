@@ -5,6 +5,7 @@ const UnauthorizedError = require('../utils/error/Unauthorized');
 const NotFound = require('../utils/error/notFound');
 const BadRequest = require('../utils/error/badRequest');
 const Conflict = require('../utils/error/Conflict');
+require('dotenv').config();
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
