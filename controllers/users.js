@@ -30,11 +30,11 @@ module.exports.login = (req, res, next) => {
 
 module.exports.getUserByID = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
+    .then((users) => {
+      if (!users) {
         throw new NotFound('Пользователь с данным ID не найден');
       }
-      return res.status(200).send({ data: user.toObject() });
+      return res.status(200).send({ data: users.toObject() });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
