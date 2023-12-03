@@ -34,7 +34,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!cards) {
         throw new NotFound('Карточка с данным ID не найдена');
       }
-      return res.status().send({ cards });
+      return res.status(201).send({ cards });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -57,7 +57,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!cards) {
         throw new NotFound('Карточка с данным ID не найдена');
       }
-      return res.status().send({ cards });
+      return res.status(200).send({ cards });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -73,9 +73,8 @@ module.exports.deleteCard = (req, res, next) => {
       if (cards.owner._id.toString() !== req.user._id) {
         Card.deleteOne(cards)
           .then(() => {
-            res.send(cards);
-          })
-          .catch(next);
+            res.status(200).send({ message: 'Карточка успешно удалена' });
+          });
       } else {
         throw new ForbiddenError('Невозможно удалить');
       }
