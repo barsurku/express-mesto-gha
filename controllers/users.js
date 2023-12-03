@@ -33,14 +33,20 @@ module.exports.getUserByID = (req, res, next) => {
       }
       return res.status(200).send({ data: users.toObject() });
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Введены некорректные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((users) => res.send({ users }))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         return next(new BadRequest('Введены некорректные данные'));
       }
       return next(err);
