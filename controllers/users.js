@@ -34,13 +34,14 @@ module.exports.getUserByID = (req, res, next) => {
       if (!user) {
         throw new NotFound('Пользователь с данным ID не найден');
       }
-      return res.status().send({ data: user.toObject() });
+      return res.status(200).send({ data: user.toObject() });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequest('Введены некорректные данные'));
+        next(new BadRequest('Введены некорректные данные'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
