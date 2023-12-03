@@ -46,7 +46,7 @@ module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((users) => res.send({ users }))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         return next(new BadRequest('Введены некорректные данные'));
       }
       return next(err);
