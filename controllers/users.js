@@ -30,7 +30,6 @@ module.exports.login = (req, res, next) => {
 
 module.exports.getUserByID = (req, res, next) => {
   User.findById(req.params.id)
-    .findById(req.params.userId)
     .orFail(() => new NotFound('Пользователь не найден.'))
     .then((users) => res.status().send(users))
     .catch((err) => {
