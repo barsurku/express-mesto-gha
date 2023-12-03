@@ -1,32 +1,27 @@
 const Card = require('../models/card');
-const ERROR_CODE = require('../utils/errors');
+const ForbiddenError = require('../utils/error/Forbidden');
+const NotFound = require('../utils/error/notFound');
+const BadRequest = require('../utils/error/badRequest');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch(() => res.status(ERROR_CODE.internalServerError).send({
-      message: 'Ошибка загрузки сервера',
-    }));
+    .catch((err) => next(err));
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-    .then((cards) => res.status(201).send({ data: cards }))
+    .then((cards) => res.status(201).send({ cards }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE.badRequest).send({
-          message: 'Введены некорректные данные',
-        });
-        return;
+        return next(new BadRequest('Введены некорректные данные'));
       }
-      res.status(ERROR_CODE.internalServerError).send({
-        message: 'Ошибка загрузки сервера',
-      });
+      return next(err);
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -37,25 +32,19 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_CODE.notFound).send({ message: 'Карточка с данным ID не найдена' });
-        return;
+        throw new NotFound('Карточка с данным ID не найдена');
       }
-      res.send(card);
+      return res.status().send({ card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE.badRequest).send({
-          message: 'Введены некорректные данные',
-        });
-        return;
+        return next(new BadRequest('Введены некорректные данные'));
       }
-      res.status(ERROR_CODE.internalServerError).send({
-        message: 'Ошибка загрузки сервера',
-      });
+      return next(err);
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -66,42 +55,40 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_CODE.notFound).send({ message: 'Карточка с данным ID не найдена' });
-        return;
+        throw new NotFound('Карточка с данным ID не найдена');
       }
-      res.send(card);
+      return res.status().send({ card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE.badRequest).send({
-          message: 'Введены некорректные данные',
-        });
-        return;
+        return next(new BadRequest('Введены некорректные данные'));
       }
-      res.status(ERROR_CODE.internalServerError).send({
-        message: 'Ошибка загрузки сервера',
-      });
+      return next(err);
     });
 };
 
-module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
+module.exports.deleteCard = (req, res, next) => {
+  Card.findById(req.params.cardId)
     .then((card) => {
-      if (!card) {
-        res.status(ERROR_CODE.notFound).send({ message: 'Карточка не найдена' });
-        return;
+      if (card.owner._id.toString() !== req.user._id) {
+        Card.deleteOne(card)
+          .then(() => {
+            res.send(card);
+          })
+          .catch(next);
+      } else {
+        throw new ForbiddenError('Невозможно удалить');
       }
-      res.send(card);
+    })
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('Карточка не найдена');
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE.badRequest).send({
-          message: 'Введены некорректные данные',
-        });
-        return;
+        return next(new BadRequest('Введены некорректные данные'));
       }
-      res.status(ERROR_CODE.internalServerError).send({
-        message: 'Ошибка загрузки сервера',
-      });
+      return next(err);
     });
 };
