@@ -34,7 +34,7 @@ module.exports.getUserByID = (req, res, next) => {
       if (!users) {
         throw new NotFound('Пользователь с данным ID не найден');
       }
-      return res.status().send({ data: users.toObject() });
+      return res.status(200).send({ data: users.toObject() });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -96,7 +96,7 @@ module.exports.updateUser = (req, res, next) => {
       if (!users) {
         throw new NotFound('Пользователь с данным ID не найден');
       }
-      return res.status().send({ users });
+      return res.status(200).send({ users });
     })
 
     .catch((err) => {
@@ -121,7 +121,7 @@ module.exports.updateAvatar = (req, res, next) => {
       if (!users) {
         throw new NotFound('Пользователь с данным ID не найден');
       }
-      return res.status().send({ users });
+      return res.status(200).send({ users });
     })
 
     .catch((err) => {

@@ -70,19 +70,14 @@ module.exports.dislikeCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((cards) => {
-      if (cards.owner._id.toString() !== req.user._id) {
-        Card.deleteOne(cards)
-          .then(() => {
-            res.status(200).send({ message: 'Карточка успешно удалена' });
-          });
-      } else {
-        throw new ForbiddenError('Невозможно удалить');
-      }
-    })
-    .then((cards) => {
-      if (!cards) {
-        throw new NotFound('Карточка не найдена');
-      }
+      if (cards === null) {
+        return next(new NotFound('Карточка не найдена'));
+      } if (req.user._id !== cards.owner.toString()) {
+        return next(new ForbiddenError('Невозможно удалить'));
+      } return cards.deleteOne()
+        .then(() => {
+          res.status(200).send({ message: 'Карточка успешно удалена' });
+        });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
