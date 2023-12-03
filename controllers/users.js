@@ -29,12 +29,12 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.getUserByID = (req, res, next) => {
-  User.findById(req.params.id)
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         throw new NotFound('Пользователь с данным ID не найден');
       }
-      res.status().send(user);
+      return res.status().send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
